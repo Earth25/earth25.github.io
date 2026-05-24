@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>승인 대기중</h2>
+
+<div id="result"></div>
+
+<script>
+
+const API_URL = "앱스크립트_URL";
+
+const tempCode = localStorage.getItem("tempCode");
+
+async function check(){
+
+  const res = await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"checkRealCode",
+      tempCode:tempCode
+    })
+  });
+
+  const data = await res.json();
+
+  if(data.approved == true){
+
+    document.getElementById("result").innerHTML =
+      `
+      실제코드:
+      ${data.realCode}
+      <br><br>
+      이 코드로 로그인하세요
+      `;
+
+  }else{
+
+    setTimeout(check,3000);
+  }
+}
+
+check();
+
+</script>
+
+</body>
+</html>
