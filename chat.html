@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>채팅</h2>
+
+<input type="text" id="target" placeholder="상대 코드">
+<input type="text" id="message">
+
+<button onclick="sendMessage()">전송</button>
+
+<hr>
+
+<div id="messages"></div>
+
+<script>
+
+const API_URL = "https://script.google.com/macros/s/AKfycbwlGTh7OgjkMF6Dvc7rKwcmZg4VJVNvbAFRyiuvGHaYtMpHfUhvHovvzaRSWkKciX5TYg/exec";
+
+const myCode = localStorage.getItem("realCode");
+
+let currentTarget = "";
+
+async function sendMessage(){
+
+  const msg = document.getElementById("message").value;
+
+  currentTarget =
+    document.getElementById("target").value;
+
+  await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"sendMessage",
+      sender:myCode,
+      receiver:currentTarget,
+      message:msg
+    })
+  });
+
+  loadMessages();
+}
+
+async function loadMessages(){
+
+  const res = await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"getMessages",
+      user1:myCode,
+      user2:currentTarget
+    })
+  });
+
+  const data = await res.json();
+
+  let html = "";
+
+  data.forEach(m=>{
+
+    html += `
+      <div>
+        <b>${m.sender}</b>:
+        ${m.message}
+      </div>
+    `;
+  });
+
+  document.getElementById("messages").innerHTML =
+    html;
+}
+
+setInterval(loadMessages,2000);
+
+</script>
+
+</body>
+</html>
